@@ -14,7 +14,7 @@ export CFLAGS ?= -O3 -g0 -I$(LVGL_DIR)/  -Wall -Wshadow -Wundef -Wmissing-protot
 	 -I /home/yixi/Work/imx6ull/chain/arm-buildroot-linux-musleabihf_sdk-buildroot/arm-buildroot-linux-musleabihf/sysroot/usr/include/dbus-1.0 -I /home/yixi/Work/imx6ull/chain/arm-buildroot-linux-musleabihf_sdk-buildroot/arm-buildroot-linux-musleabihf/sysroot/usr/lib/dbus-1.0/include -I/home/yixi/Work/TSPI/buildroot/buildroot-2025.02/output/host/aarch64-buildroot-linux-gnu/sysroot/usr/include/freetype2
 export CPPFLAGS = -O3 -g0 -I$(LVGL_DIR)/$(LVGL_DIR_NAME) -I$(LVGL_DIR)
 
-export LDFLAGS ?= -lm -ldbus-1 -lpthread -lpng -ljpeg -lharfbuzz -lfreetype -lstdc++ -lc -lcurl
+export LDFLAGS ?= -lm -ldbus-1 -lpthread -lpng -ljpeg -lharfbuzz -lfreetype -lstdc++ -lc
 BIN = main
 
 
