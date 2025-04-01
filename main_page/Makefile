@@ -15,7 +15,7 @@ export CFLAGS ?= -O3 -g0 -I$(LVGL_DIR)/  -Wall -Wshadow -Wundef -Wmissing-protot
 export CPPFLAGS = -O3 -g0 -I$(LVGL_DIR)/$(LVGL_DIR_NAME) -I$(LVGL_DIR)
 
 export LDFLAGS ?= -lm -ldbus-1 -lpthread -lpng -ljpeg -lharfbuzz -lfreetype -lstdc++ -lc
-BIN = main
+BIN = Main
 
 
 # 从make传递的参数获取子应用的编译速度设置，示例：make -j16 RUN_JOBS=-j16

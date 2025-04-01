@@ -4,15 +4,7 @@
 #include "stdlib.h"
 // #include "src/sys.h"
 
-#define WEATHER_ICON_DIR "S:./res/weather_icon/"
-#define SystemFontFile "/mnt/desk/font/simsun.ttc"
-
-#define WEATHER_MISC_FMT "降水量%d.%dmm, 最低气温%d℃, 最高气温%d℃, %s风%d级.   "
-
-// LV_IMG_DECLARE(temp_icon)
-// LV_IMG_DECLARE(humi_icon)
-
-// LV_FONT_DECLARE(lv_font_boli_72)
+#define SystemFontFile "/usr/work/simsun.ttc"
 
 static lv_ft_info_t font16;
 static lv_ft_info_t font24;
@@ -40,8 +32,8 @@ struct MainObj
 static void application_click_event_cb(lv_event_t *e);
 
 // LCD分辨率
-static uint32_t lcdW = 480;
-static uint32_t lcdH = 272;
+static uint32_t lcdW = 1280;
+static uint32_t lcdH = 720;
 
 // UI回调函数集合
 static MainPageUI::Operations uiOpts;
@@ -82,7 +74,7 @@ void MainPageUI::create(Operations &opts, const char *bgFile)
   lv_obj_center(backImage);
   lv_obj_clear_flag(backImage, LV_OBJ_FLAG_SCROLLABLE); // 设置不可滚动
   char path[36];
-  sprintf(path, "%s%s", "S:./res/background/", bgFile);
+  sprintf(path, "%s%s", "/usr/work/background/", bgFile);
   lv_img_set_src(backImage, path); // 设置背景图片
 
   // 创建主界面元素
@@ -107,101 +99,101 @@ void MainPageUI::create(Operations &opts, const char *bgFile)
   lv_obj_set_style_border_opa(mainObj.appCont, LV_OPA_TRANSP, LV_STATE_DEFAULT);        // 边框透明
   lv_obj_align(mainObj.appCont, LV_ALIGN_BOTTOM_MID, 0, -60);
 
-  // 创建天气相关元素
-  WeatherObj *weatherObj = &mainObj.weatherObj;
+  // // 创建天气相关元素
+  // WeatherObj *weatherObj = &mainObj.weatherObj;
 
-  weatherObj->cont = lv_obj_create(backImage); // 创建天气容器
-  lv_obj_set_size(weatherObj->cont, 260, 160);
-  lv_obj_clear_flag(weatherObj->cont, LV_OBJ_FLAG_SCROLLABLE);                           // 禁止滚动
-  lv_obj_set_style_bg_color(weatherObj->cont, lv_color_hex(0xeddddd), LV_STATE_DEFAULT); // 背景颜色
-  lv_obj_set_style_bg_opa(weatherObj->cont, LV_OPA_40, LV_STATE_DEFAULT);                // 背景透明度
-  lv_obj_set_style_border_opa(weatherObj->cont, LV_OPA_TRANSP, LV_STATE_DEFAULT);        // 边框透明
-  lv_obj_align(weatherObj->cont, LV_ALIGN_TOP_RIGHT, -20, 20);
+  // weatherObj->cont = lv_obj_create(backImage); // 创建天气容器
+  // lv_obj_set_size(weatherObj->cont, 260, 160);
+  // lv_obj_clear_flag(weatherObj->cont, LV_OBJ_FLAG_SCROLLABLE);                           // 禁止滚动
+  // lv_obj_set_style_bg_color(weatherObj->cont, lv_color_hex(0xeddddd), LV_STATE_DEFAULT); // 背景颜色
+  // lv_obj_set_style_bg_opa(weatherObj->cont, LV_OPA_40, LV_STATE_DEFAULT);                // 背景透明度
+  // lv_obj_set_style_border_opa(weatherObj->cont, LV_OPA_TRANSP, LV_STATE_DEFAULT);        // 边框透明
+  // lv_obj_align(weatherObj->cont, LV_ALIGN_TOP_RIGHT, -20, 20);
 
-  weatherObj->img = lv_img_create(weatherObj->cont); // 创建天气icon
-  lv_img_set_src(weatherObj->img, WEATHER_ICON_DIR "0.bin");
-  lv_obj_align(weatherObj->img, LV_ALIGN_TOP_RIGHT, 20, -20);
+  // weatherObj->img = lv_img_create(weatherObj->cont); // 创建天气icon
+  // lv_img_set_src(weatherObj->img, WEATHER_ICON_DIR "0.bin");
+  // lv_obj_align(weatherObj->img, LV_ALIGN_TOP_RIGHT, 20, -20);
 
-  weatherObj->addressLabel = lv_label_create(weatherObj->cont); // 创建地址label
-  lv_obj_set_style_text_font(weatherObj->addressLabel, font28.font, LV_STATE_DEFAULT);
-  lv_obj_set_style_text_color(weatherObj->addressLabel, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
-  lv_label_set_text(weatherObj->addressLabel, "定位失败");
-  lv_obj_align(weatherObj->addressLabel, LV_ALIGN_TOP_LEFT, 20, -10);
+  // weatherObj->addressLabel = lv_label_create(weatherObj->cont); // 创建地址label
+  // lv_obj_set_style_text_font(weatherObj->addressLabel, font28.font, LV_STATE_DEFAULT);
+  // lv_obj_set_style_text_color(weatherObj->addressLabel, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
+  // lv_label_set_text(weatherObj->addressLabel, "定位失败");
+  // lv_obj_align(weatherObj->addressLabel, LV_ALIGN_TOP_LEFT, 20, -10);
 
-  lv_obj_t **barArray[] = {&weatherObj->tempBar, &weatherObj->humiBar};
-  // const lv_img_dsc_t *bar_icon[] = {&temp_icon, &humi_icon};
-  lv_obj_t *lastImg;
+  // lv_obj_t **barArray[] = {&weatherObj->tempBar, &weatherObj->humiBar};
+  // // const lv_img_dsc_t *bar_icon[] = {&temp_icon, &humi_icon};
+  // lv_obj_t *lastImg;
 
-  for (int i = 0; i < 2; i++)
-  {
-    lv_obj_t *img = lv_img_create(weatherObj->cont); // 创建温度湿度相关
-    // lv_img_set_src(img, bar_icon[i]);
-    if (i == 0)
-      lv_obj_set_pos(img, -20, 30);
-    else
-      lv_obj_align_to(img, lastImg, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+  // for (int i = 0; i < 2; i++)
+  // {
+  //   lv_obj_t *img = lv_img_create(weatherObj->cont); // 创建温度湿度相关
+  //   // lv_img_set_src(img, bar_icon[i]);
+  //   if (i == 0)
+  //     lv_obj_set_pos(img, -20, 30);
+  //   else
+  //     lv_obj_align_to(img, lastImg, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
 
-    lv_obj_t *bar = lv_bar_create(weatherObj->cont);
-    lv_obj_set_size(bar, 60, 12);
-    lv_bar_set_range(bar, -50, 50); // 温度范围-50  ~ 50
-    lv_bar_set_value(bar, 22, LV_ANIM_ON);
-    lv_obj_set_style_border_width(bar, 2, LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(bar, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(bar, lv_color_hex(0xce6767), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_all(bar, 1, LV_STATE_DEFAULT);
-    lv_obj_align_to(bar, img, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
+  //   lv_obj_t *bar = lv_bar_create(weatherObj->cont);
+  //   lv_obj_set_size(bar, 60, 12);
+  //   lv_bar_set_range(bar, -50, 50); // 温度范围-50  ~ 50
+  //   lv_bar_set_value(bar, 22, LV_ANIM_ON);
+  //   lv_obj_set_style_border_width(bar, 2, LV_STATE_DEFAULT);
+  //   lv_obj_set_style_border_color(bar, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
+  //   lv_obj_set_style_bg_color(bar, lv_color_hex(0xce6767), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+  //   lv_obj_set_style_pad_all(bar, 1, LV_STATE_DEFAULT);
+  //   lv_obj_align_to(bar, img, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-    lv_obj_t *label = lv_label_create(weatherObj->cont);
-    lv_obj_set_style_text_font(label, font16.font, LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
-    lv_label_set_text(label, "22℃");
-    lv_obj_align_to(label, bar, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
+  //   lv_obj_t *label = lv_label_create(weatherObj->cont);
+  //   lv_obj_set_style_text_font(label, font16.font, LV_STATE_DEFAULT);
+  //   lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
+  //   lv_label_set_text(label, "22℃");
+  //   lv_obj_align_to(label, bar, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-    lv_obj_set_user_data(bar, label);
+  //   lv_obj_set_user_data(bar, label);
 
-    *(barArray[i]) = bar;
-    lastImg = img;
-  }
-  lv_bar_set_range(weatherObj->humiBar, 0, 100); // 湿度范围0  ~ 100
-  lv_obj_set_style_bg_color(weatherObj->humiBar, lv_color_hex(0x1454cc), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-  lv_label_set_text((lv_obj_t *)lv_obj_get_user_data(weatherObj->humiBar), "50%");
-  lv_bar_set_value(weatherObj->humiBar, 50, LV_ANIM_ON);
+  //   *(barArray[i]) = bar;
+  //   lastImg = img;
+  // }
+  // lv_bar_set_range(weatherObj->humiBar, 0, 100); // 湿度范围0  ~ 100
+  // lv_obj_set_style_bg_color(weatherObj->humiBar, lv_color_hex(0x1454cc), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+  // lv_label_set_text((lv_obj_t *)lv_obj_get_user_data(weatherObj->humiBar), "50%");
+  // lv_bar_set_value(weatherObj->humiBar, 50, LV_ANIM_ON);
 
-  weatherObj->miscLabel = lv_label_create(weatherObj->cont);
-  lv_obj_set_size(weatherObj->miscLabel, 220, 30);
-  lv_label_set_long_mode(weatherObj->miscLabel, LV_LABEL_LONG_SCROLL);
-  lv_obj_set_style_text_font(weatherObj->miscLabel, font24.font, LV_STATE_DEFAULT);
-  lv_obj_set_style_text_color(weatherObj->miscLabel, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
-  lv_label_set_text_fmt(weatherObj->miscLabel, WEATHER_MISC_FMT, 0, 0, 10, 20, "东", 1);
-  lv_obj_align(weatherObj->miscLabel, LV_ALIGN_BOTTOM_MID, 0, 20);
+  // weatherObj->miscLabel = lv_label_create(weatherObj->cont);
+  // lv_obj_set_size(weatherObj->miscLabel, 220, 30);
+  // lv_label_set_long_mode(weatherObj->miscLabel, LV_LABEL_LONG_SCROLL);
+  // lv_obj_set_style_text_font(weatherObj->miscLabel, font24.font, LV_STATE_DEFAULT);
+  // lv_obj_set_style_text_color(weatherObj->miscLabel, lv_color_hex(0xffffff), LV_STATE_DEFAULT);
+  // lv_label_set_text_fmt(weatherObj->miscLabel, WEATHER_MISC_FMT, 0, 0, 10, 20, "东", 1);
+  // lv_obj_align(weatherObj->miscLabel, LV_ALIGN_BOTTOM_MID, 0, 20);
 }
 
-/**
- *@brief 更新主界面天气信息
- */
-void MainPageUI::updateWeather(WeatherInfo &weatherInfo)
-{
-  WeatherObj *w = &mainObj.weatherObj;
-  lv_obj_t *bar_label;
+// /**
+//  *@brief 更新主界面天气信息
+//  */
+// void MainPageUI::updateWeather(WeatherInfo &weatherInfo)
+// {
+//   WeatherObj *w = &mainObj.weatherObj;
+//   lv_obj_t *bar_label;
 
-  lv_label_set_text(w->addressLabel, weatherInfo.position);
-  lv_bar_set_value(w->tempBar, weatherInfo.temp, LV_ANIM_ON);
-  lv_bar_set_value(w->humiBar, weatherInfo.humi, LV_ANIM_ON);
+//   lv_label_set_text(w->addressLabel, weatherInfo.position);
+//   lv_bar_set_value(w->tempBar, weatherInfo.temp, LV_ANIM_ON);
+//   lv_bar_set_value(w->humiBar, weatherInfo.humi, LV_ANIM_ON);
 
-  bar_label = (lv_obj_t *)lv_obj_get_user_data(w->tempBar);
-  lv_label_set_text_fmt(bar_label, "%d℃", weatherInfo.temp);
-  bar_label = (lv_obj_t *)lv_obj_get_user_data(w->humiBar);
-  lv_label_set_text_fmt(bar_label, "%d%%", weatherInfo.humi);
+//   bar_label = (lv_obj_t *)lv_obj_get_user_data(w->tempBar);
+//   lv_label_set_text_fmt(bar_label, "%d℃", weatherInfo.temp);
+//   bar_label = (lv_obj_t *)lv_obj_get_user_data(w->humiBar);
+//   lv_label_set_text_fmt(bar_label, "%d%%", weatherInfo.humi);
 
-  char path[32];
-  sprintf(path, WEATHER_ICON_DIR "%d.bin", weatherInfo.code);
-  lv_img_set_src(w->img, path);
+//   char path[32];
+//   sprintf(path, WEATHER_ICON_DIR "%d.bin", weatherInfo.code);
+//   lv_img_set_src(w->img, path);
 
-  lv_label_set_text_fmt(w->miscLabel, WEATHER_MISC_FMT, weatherInfo.rainFall / 100, weatherInfo.rainFall % 100,
-                        weatherInfo.minTemp, weatherInfo.maxTemp, weatherInfo.windDir, weatherInfo.windLevel);
+//   lv_label_set_text_fmt(w->miscLabel, WEATHER_MISC_FMT, weatherInfo.rainFall / 100, weatherInfo.rainFall % 100,
+//                         weatherInfo.minTemp, weatherInfo.maxTemp, weatherInfo.windDir, weatherInfo.windLevel);
 
-  lv_label_set_long_mode(w->miscLabel, LV_LABEL_LONG_SCROLL);
-}
+//   lv_label_set_long_mode(w->miscLabel, LV_LABEL_LONG_SCROLL);
+// }
 
 /**
  *@brief 在主界面添加一个app icon
@@ -310,10 +302,10 @@ void MainPageUI::bootCreate(void)
   lv_obj_set_size(bootImage, lcdW, lcdH);
   lv_obj_center(bootImage);
   lv_obj_clear_flag(bootImage, LV_OBJ_FLAG_SCROLLABLE); // 设置不可滚动
-  lv_img_set_src(bootImage, "S:./res/background/bootbg.bin");
+  lv_img_set_src(bootImage, "/usr/work/background/bootbg.bin");
 
   lv_obj_t *bootLogo = lv_gif_create(bootImage); // 创建giflogo
-  lv_gif_set_src(bootLogo, "S:./res/background/bootlogo.gif");
+  lv_gif_set_src(bootLogo, "/usr/work/background/bootlogo.gif");
   lv_obj_align(bootLogo, LV_ALIGN_CENTER, 0, -50);
 
   lv_obj_t *bootSpinner = lv_spinner_create(bootImage, 1000, 60); // 创建旋转加载器
