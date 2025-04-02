@@ -6,6 +6,9 @@
 
 #define SystemFontFile "/usr/work/simsun.ttc"
 
+LV_IMG_DECLARE(home)
+LV_IMG_DECLARE(boot)
+
 static lv_ft_info_t font16;
 static lv_ft_info_t font24;
 static lv_ft_info_t font28;
@@ -75,7 +78,7 @@ void MainPageUI::create(Operations &opts, const char *bgFile)
   lv_obj_clear_flag(backImage, LV_OBJ_FLAG_SCROLLABLE); // 设置不可滚动
   char path[36];
   sprintf(path, "%s%s", "/usr/work/background/", bgFile);
-  lv_img_set_src(backImage, path); // 设置背景图片
+  lv_img_set_src(backImage, &home); // 设置背景图片
 
   // 创建主界面元素
   mainObj.timeLabel = lv_label_create(backImage);                                           // 创建时间label
@@ -302,17 +305,18 @@ void MainPageUI::bootCreate(void)
   lv_obj_set_size(bootImage, lcdW, lcdH);
   lv_obj_center(bootImage);
   lv_obj_clear_flag(bootImage, LV_OBJ_FLAG_SCROLLABLE); // 设置不可滚动
-  lv_img_set_src(bootImage, "/usr/work/background/bootbg.bin");
+  // lv_img_set_src(bootImage, "/usr/work/background/bootbg.bin");
+    lv_img_set_src(bootImage, &boot);
 
-  lv_obj_t *bootLogo = lv_gif_create(bootImage); // 创建giflogo
-  lv_gif_set_src(bootLogo, "/usr/work/background/bootlogo.gif");
-  lv_obj_align(bootLogo, LV_ALIGN_CENTER, 0, -50);
+  // lv_obj_t *bootLogo = lv_gif_create(bootImage); // 创建giflogo
+  // lv_gif_set_src(bootLogo, "/usr/work/background/bootlogo.gif");
+  // lv_obj_align(bootLogo, LV_ALIGN_CENTER, 0, -50);
 
-  lv_obj_t *bootSpinner = lv_spinner_create(bootImage, 1000, 60); // 创建旋转加载器
-  lv_obj_set_size(bootSpinner, 100, 100);
-  lv_obj_set_style_arc_opa(bootSpinner, LV_OPA_TRANSP, LV_STATE_DEFAULT);
-  lv_obj_set_style_arc_color(bootSpinner, lv_color_hex(0xffffff), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-  lv_obj_align_to(bootSpinner, bootLogo, LV_ALIGN_OUT_BOTTOM_MID, 0, 60);
+  // lv_obj_t *bootSpinner = lv_spinner_create(bootImage, 1000, 60); // 创建旋转加载器
+  // lv_obj_set_size(bootSpinner, 100, 100);
+  // lv_obj_set_style_arc_opa(bootSpinner, LV_OPA_TRANSP, LV_STATE_DEFAULT);
+  // lv_obj_set_style_arc_color(bootSpinner, lv_color_hex(0xffffff), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+  // lv_obj_align_to(bootSpinner, bootLogo, LV_ALIGN_OUT_BOTTOM_MID, 0, 60);
 
   lv_obj_t *bootLabel = lv_label_create(bootImage);
   lv_obj_set_style_text_font(bootLabel, font36.font, LV_STATE_DEFAULT);
@@ -321,7 +325,7 @@ void MainPageUI::bootCreate(void)
   lv_label_set_text(bootLabel, "系统初始化");
 
   lv_obj_set_user_data(bootImage, bootLabel);
-  lv_obj_set_user_data(bootLabel, bootSpinner);
+  // lv_obj_set_user_data(bootLabel, bootSpinner);
 }
 
 /**
@@ -350,7 +354,10 @@ void MainPageUI::bootUpdate(const char *text)
  */
 void MainPageUI::bootRelease(void)
 {
-  lv_obj_del_async(bootImage);
+  if (bootImage != NULL) {
+    lv_obj_del_async(bootImage);
+    bootImage = NULL;       // 将指针置为 NULL，防止重复删除
+    }
 }
 
 /**

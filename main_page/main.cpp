@@ -2,7 +2,7 @@
  * @Author: yixi 3283804330@qq.com
  * @Date: 2025-03-31 15:06:02
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-02 02:44:24
+ * @LastEditTime: 2025-04-02 16:49:57
  * @Description: 
  * @FilePath: /yixi_desktop/main_page/main.cpp
  */
@@ -110,5 +110,5 @@ static void mainPageExitCallback(void)
 {
     delete mainPage;
 
-    exit(0);
+    // exit(0);
 }

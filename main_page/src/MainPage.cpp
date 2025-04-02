@@ -92,8 +92,8 @@ MainPage::~MainPage()
 
   MainPageUI::release();
 
-  shmdt((void *)configMem);
-  shmctl(shmId, IPC_RMID, 0); // 删除共享内存
+  // shmdt((void *)configMem);
+  // shmctl(shmId, IPC_RMID, 0); // 删除共享内存
 }
 
 /**
@@ -257,8 +257,8 @@ void MainPage::installApplications(vector<AppInfo> &appVector)
     const char *name = info.name.c_str();
     char **argv;
 
-    sprintf(exec, "./%s", info.exec.c_str());
-    sprintf(icon, "S:./res/icon/%s", info.icon.c_str());
+    sprintf(exec, "/usr/work/%s", info.exec.c_str());
+    sprintf(icon, "/usr/work/icon/%s", info.icon.c_str());
     argv = stringToArgv(exec, info.argv);
 
     MainPageUI::addApplication((name), exec, argv, icon); // 添加应用程序到UI
@@ -309,21 +309,21 @@ int MainPage::mainThreadFunction(void)
 
   printf("main running\n");
 
-  while (!threadExitFlag)
-  {
-    if (tick % 5 == 0)
-    {
-      getSysTime(timeInfo); // 获取系统时间(500ms)
-      uiMutex->lock();
-      MainPageUI::updateDateTime(timeInfo); // 更新时间显示
-      uiMutex->unlock();
-    }
+  // while (!threadExitFlag)
+  // {
+  //   if (tick % 5 == 0)
+  //   {
+  //     getSysTime(timeInfo); // 获取系统时间(500ms)
+  //     uiMutex->lock();
+  //     MainPageUI::updateDateTime(timeInfo); // 更新时间显示
+  //     uiMutex->unlock();
+  //   }
 
-    if (++tick >= 300) // 10分钟
-      tick = 0;
+  //   if (++tick >= 300) // 10分钟
+  //     tick = 0;
 
-    usleep(100000); // 1 tick = 100ms
-  }
+  //   usleep(100000); // 1 tick = 100ms
+  // }
 
   return 0;
 }
@@ -338,39 +338,39 @@ int MainPage::bootThreadFunction(void)
   uiMutex->unlock();
   usleep(50000);
 
-  // 加载配置文件
-  uiMutex->lock();
-  MainPageUI::bootUpdate("正在加载配置文件...");
-  uiMutex->unlock();
-  if (readConfig() != true) // 读取配置文件
-    saveConfig();           // 写入缺省信息到配置文件
+  // // 加载配置文件
+  // uiMutex->lock();
+  // MainPageUI::bootUpdate("正在加载配置文件...");
+  // uiMutex->unlock();
+  // if (readConfig() != true) // 读取配置文件
+  //   saveConfig();           // 写入缺省信息到配置文件
 
-  bgFile = sysConfig.mainbgFile;            // 设置背景图片
-  // sys_set_brightness(sysConfig.brightness); // 设置背光
+  // bgFile = sysConfig.mainbgFile;            // 设置背景图片
+  // // sys_set_brightness(sysConfig.brightness); // 设置背光
 
-  // 创建共享内存并写入配置
-  configMem = (SysConfigMem *)createShareMem(sizeof(SysConfigMem) + sizeof(SysConfigMem::AppInfoMem) * legalConfigAppNum);
-  if (configMem != nullptr)
-  {
-    configMem->magic = 0;
-    configMem->brightness = sysConfig.brightness;
-    configMem->volume = sysConfig.volume;
-    configMem->appNum = legalConfigAppNum;
-    strcpy(configMem->mainbgFile, sysConfig.mainbgFile.c_str());
-    strcpy(configMem->weatherKey, sysConfig.weatherKey.c_str());
+  // // 创建共享内存并写入配置
+  // configMem = (SysConfigMem *)createShareMem(sizeof(SysConfigMem) + sizeof(SysConfigMem::AppInfoMem) * legalConfigAppNum);
+  // if (configMem != nullptr)
+  // {
+  //   configMem->magic = 0;
+  //   configMem->brightness = sysConfig.brightness;
+  //   configMem->volume = sysConfig.volume;
+  //   configMem->appNum = legalConfigAppNum;
+  //   strcpy(configMem->mainbgFile, sysConfig.mainbgFile.c_str());
+  //   strcpy(configMem->weatherKey, sysConfig.weatherKey.c_str());
 
-    int i = 0;
-    for (AppInfo &info : sysConfig.appVector)
-    {
-      if(info.config == "")
-        continue;
+  //   int i = 0;
+  //   for (AppInfo &info : sysConfig.appVector)
+  //   {
+  //     if(info.config == "")
+  //       continue;
 
-      sprintf(configMem->appInfo[i].name, "%s", info.name.c_str());
-      sprintf(configMem->appInfo[i].config, "%s%s", CONFIG_DIR, info.config.c_str());
+  //     sprintf(configMem->appInfo[i].name, "%s", info.name.c_str());
+  //     sprintf(configMem->appInfo[i].config, "%s%s", CONFIG_DIR, info.config.c_str());
 
-      ++i;
-    }
-  }
+  //     ++i;
+  //   }
+  // }
 
   // // 加载网卡驱动
   // uiMutex->lock();
@@ -404,7 +404,7 @@ int MainPage::bootThreadFunction(void)
 
   uiMutex->lock();
   MainPageUI::create(uiOpts, bgFile.c_str()); // 初始化主界面UI
-  installApplications(sysConfig.appVector);
+  // installApplications(sysConfig.appVector);
   uiMutex->unlock();
 
   uiMutex->lock();

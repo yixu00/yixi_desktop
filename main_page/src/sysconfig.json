@@ -1,0 +1,16 @@
+{
+    "brightness": 50,
+    "volume": 50,
+    "mainbg": "/usr/work/background/mainbg_1.bin",
+    "weather_key": "weatherKey",
+
+    "applications": [
+        {
+            "name": "图片",
+            "exec": "/usr/work/picture",
+            "argv": "<null>",
+            "icon": "/usr/work/icon/picture_icon.bin",
+            "config": null
+        }
+    ]
+}
