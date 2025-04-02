@@ -100,6 +100,82 @@ MainPage::~MainPage()
  *@brief 读取设置信息
  *@return true - 读取到了配置信息  false - 缺省值配置信息
  */
+// bool MainPage::readConfig(void)
+// {
+//   ifstream file;
+//   legalConfigAppNum = 0;
+
+//   file.open(CONFIG_DIR CONFIG_FILE, ios::in);
+
+//   if (file.is_open() != true)
+//   {
+//     sysConfig.brightness = 50; // 缺省值
+//     sysConfig.volume = 50;
+//     sysConfig.mainbgFile = "mainbg_1.bin";
+//     sysConfig.weatherKey = "";
+
+//     AppInfo info = {.name = "设置", .exec = "setting", .argv = "<null>", .icon = "setting_icon.bin", .config = ""};
+//     sysConfig.appVector.push_back(info);
+
+//     return false;
+//   }
+
+//   char *buf = new char[4096];
+//   memset(buf, 0, 4096);
+//   file.read(buf, 4096);
+//   file.close();
+
+//   cJSON *cjson = cJSON_Parse(buf); // 打包cJSON数据格式
+//   if (cjson != nullptr)
+//   {
+//     // int *value[] = {&sysConfig.brightness, &sysConfig.volume}; // 数值参数
+//     // for (int i = 0; i < sizeof(value) / sizeof(value[0]); i++)
+//     // {
+//     //   cJSON *item = cJSON_GetObjectItem(cjson, configNumberItemName[i]);
+//     //   if (item != nullptr)
+//     //     *(value[i]) = item->valueint;
+//     // }
+
+//     // string *config_str[] = {&sysConfig.mainbgFile, &sysConfig.weatherKey}; // 字符串参数
+//     // for (int i = 0; i < sizeof(config_str) / sizeof(config_str[0]); i++)
+//     // {
+//     //   cJSON *item = cJSON_GetObjectItem(cjson, configStringItemName[i]);
+//     //   if (item != nullptr)
+//     //     *(config_str[i]) = string(item->valuestring);
+//     // }
+
+//     // printf("param sysConfig end\n");
+
+//     // 应用程序
+//     cJSON *applications = cJSON_GetObjectItem(cjson, "applications");
+//     int array_size = cJSON_GetArraySize(applications);
+//     for (int i = 0; i < array_size; i++)
+//     {
+//       cJSON *app_info = cJSON_GetArrayItem(applications, i);
+
+//       AppInfo info;
+//       string *app_str[] = {&info.name, &info.exec, &info.argv, &info.icon, &info.config};
+//       for (int j = 0; j < sizeof(app_str) / sizeof(app_str[0]); j++)
+//       {
+//         cJSON *item = cJSON_GetObjectItem(app_info, appInfoItemName[j]);
+//         if (item != nullptr && item->type != cJSON_NULL)
+//           *(app_str[j]) = string(item->valuestring);
+//       }
+
+//       if(info.config != "")
+//         ++legalConfigAppNum;
+
+//       sysConfig.appVector.push_back(info); // 向容器插入一个元素
+//     }
+//     printf("applications sysConfig end\n");
+
+//     cJSON_Delete(cjson);
+//   }
+//   delete[] buf;
+
+//   return true;
+// }
+
 bool MainPage::readConfig(void)
 {
   ifstream file;
@@ -120,33 +196,25 @@ bool MainPage::readConfig(void)
     return false;
   }
 
-  char *buf = new char[4096];
-  memset(buf, 0, 4096);
-  file.read(buf, 4096);
+  file.seekg(0, ios::end);
+  size_t fileSize = file.tellg();
+  file.seekg(0, ios::beg);
+
+  char *buf = new char[fileSize + 1]; // +1 用于存储字符串的终止符 '\0'
+  memset(buf, 0, fileSize + 1);
+  file.read(buf, fileSize);
   file.close();
 
-  cJSON *cjson = cJSON_Parse(buf); // 打包cJSON数据格式
+  if (!file)
+  {
+    delete[] buf;
+    return false;
+  }
+
+  cJSON *cjson = cJSON_Parse(buf);
   if (cjson != nullptr)
   {
-    // int *value[] = {&sysConfig.brightness, &sysConfig.volume}; // 数值参数
-    // for (int i = 0; i < sizeof(value) / sizeof(value[0]); i++)
-    // {
-    //   cJSON *item = cJSON_GetObjectItem(cjson, configNumberItemName[i]);
-    //   if (item != nullptr)
-    //     *(value[i]) = item->valueint;
-    // }
-
-    // string *config_str[] = {&sysConfig.mainbgFile, &sysConfig.weatherKey}; // 字符串参数
-    // for (int i = 0; i < sizeof(config_str) / sizeof(config_str[0]); i++)
-    // {
-    //   cJSON *item = cJSON_GetObjectItem(cjson, configStringItemName[i]);
-    //   if (item != nullptr)
-    //     *(config_str[i]) = string(item->valuestring);
-    // }
-
-    // printf("param sysConfig end\n");
-
-    // 应用程序
+        // 应用程序
     cJSON *applications = cJSON_GetObjectItem(cjson, "applications");
     int array_size = cJSON_GetArraySize(applications);
     for (int i = 0; i < array_size; i++)
@@ -170,6 +238,44 @@ bool MainPage::readConfig(void)
     printf("applications sysConfig end\n");
 
     cJSON_Delete(cjson);
+
+
+
+    // // 获取 applications 数组  
+    // cJSON *applications = cJSON_GetObjectItem(cjson, "applications");  
+    // if (applications != nullptr) {  
+    //     int array_size = cJSON_GetArraySize(applications);  
+    //     for (int i = 0; i < array_size; i++) {  
+    //         cJSON *app_info = cJSON_GetArrayItem(applications, i);  
+    //         if (app_info == nullptr) continue; // 跳过无效项  
+
+    //         AppInfo info; // 创建新的 AppInfo 实例  
+    //         for (int j = 0; j < sizeof(appInfoItemName) / sizeof(appInfoItemName[0]); j++) {  
+    //             cJSON *item = cJSON_GetObjectItem(app_info, appInfoItemName[j]);  
+    //             if (item != nullptr && item->type == cJSON_String) {  
+    //                 switch (j) {  
+    //                     case 0: info.name = string(item->valuestring); break; // name  
+    //                     case 1: info.exec = string(item->valuestring); break; // exec  
+    //                     case 2: info.argv = string(item->valuestring); break; // argv  
+    //                     case 3: info.icon = string(item->valuestring); break; // icon  
+    //                     case 4: info.config = string(item->valuestring); break; // config  
+    //                     default: break;  
+    //                 }  
+    //             }  
+    //         }  
+
+    //         // 检查有效的 exec 并增加计数  
+    //         if (!info.exec.empty()) {  
+    //             ++legalConfigAppNum;  
+    //         }  
+
+    //         // 添加到 sysConfig 的向量  
+    //         sysConfig.appVector.push_back(info);  
+    //     }  
+    // } else {  
+    //     // cout << "No applications found in config." << endl;  
+    // }  
+    // cJSON_Delete(cjson);
   }
   delete[] buf;
 
@@ -277,6 +383,8 @@ void *MainPage::createShareMem(size_t memSize)
   {
     printf("shmget failed\n");
     return nullptr;
+  }else{
+    printf("shmegt success\n");
   }
 
   pMem = shmat(shmId, (void *)0, 0); // 将共享内存连接到当前进程的地址空间
@@ -338,39 +446,39 @@ int MainPage::bootThreadFunction(void)
   uiMutex->unlock();
   usleep(50000);
 
-  // // 加载配置文件
-  // uiMutex->lock();
-  // MainPageUI::bootUpdate("正在加载配置文件...");
-  // uiMutex->unlock();
-  // if (readConfig() != true) // 读取配置文件
-  //   saveConfig();           // 写入缺省信息到配置文件
+  // 加载配置文件
+  uiMutex->lock();
+  MainPageUI::bootUpdate("正在加载配置文件...");
+  uiMutex->unlock();
+  if (readConfig() != true) // 读取配置文件
+    saveConfig();           // 写入缺省信息到配置文件
 
   // bgFile = sysConfig.mainbgFile;            // 设置背景图片
   // // sys_set_brightness(sysConfig.brightness); // 设置背光
 
-  // // 创建共享内存并写入配置
-  // configMem = (SysConfigMem *)createShareMem(sizeof(SysConfigMem) + sizeof(SysConfigMem::AppInfoMem) * legalConfigAppNum);
-  // if (configMem != nullptr)
-  // {
-  //   configMem->magic = 0;
-  //   configMem->brightness = sysConfig.brightness;
-  //   configMem->volume = sysConfig.volume;
-  //   configMem->appNum = legalConfigAppNum;
-  //   strcpy(configMem->mainbgFile, sysConfig.mainbgFile.c_str());
-  //   strcpy(configMem->weatherKey, sysConfig.weatherKey.c_str());
+  //创建共享内存并写入配置
+  configMem = (SysConfigMem *)createShareMem(sizeof(SysConfigMem) + sizeof(SysConfigMem::AppInfoMem) * legalConfigAppNum);
+  if (configMem != nullptr)
+  {
+    configMem->magic = 0;
+    configMem->brightness = sysConfig.brightness;
+    configMem->volume = sysConfig.volume;
+    configMem->appNum = legalConfigAppNum;
+    strcpy(configMem->mainbgFile, sysConfig.mainbgFile.c_str());
+    strcpy(configMem->weatherKey, sysConfig.weatherKey.c_str());
 
-  //   int i = 0;
-  //   for (AppInfo &info : sysConfig.appVector)
-  //   {
-  //     if(info.config == "")
-  //       continue;
+    int i = 0;
+    for (AppInfo &info : sysConfig.appVector)
+    {
+      if(info.config == "")
+        continue;
 
-  //     sprintf(configMem->appInfo[i].name, "%s", info.name.c_str());
-  //     sprintf(configMem->appInfo[i].config, "%s%s", CONFIG_DIR, info.config.c_str());
+      sprintf(configMem->appInfo[i].name, "%s", info.name.c_str());
+      sprintf(configMem->appInfo[i].config, "%s%s", CONFIG_DIR, info.config.c_str());
 
-  //     ++i;
-  //   }
-  // }
+      ++i;
+    }
+  }
 
   // // 加载网卡驱动
   // uiMutex->lock();
