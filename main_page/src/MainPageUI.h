@@ -1,3 +1,11 @@
+/*
+ * @Author: yixi 3283804330@qq.com
+ * @Date: 2025-04-01 00:10:51
+ * @LastEditors: Do not edit
+ * @LastEditTime: 2025-04-04 20:29:16
+ * @Description: 
+ * @FilePath: /yixi_desktop/main_page/src/MainPageUI.h
+ */
 #ifndef _MAINPAGE_GUI_H_
 #define _MAINPAGE_GUI_H_
 
@@ -50,7 +58,7 @@ namespace MainPageUI
 
     void updateDateTime(TimeInfo &time);
     void updateWeather(WeatherInfo &weather);
-    void addApplication(const char *name, const char *exec, char *const argv[], void *icon);
+    void addApplication(const char *name, const char *exec, char *const argv[], const char *icon);
 
 };
 

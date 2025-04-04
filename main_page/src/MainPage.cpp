@@ -355,24 +355,17 @@ void MainPage::installApplications(vector<AppInfo> &appVector)
 {
   for (AppInfo &info : appVector)
   {
-    int execLen = info.exec.length();
-    int iconLen = info.icon.length();
-
-    char *exec = new char[execLen + 3];
-    char *icon = new char[iconLen + 14];
+    const char *icon = info.icon.c_str();
+    const char *exec = info.exec.c_str();
     const char *name = info.name.c_str();
     char **argv;
 
-    sprintf(exec, "/usr/work/%s", info.exec.c_str());
-    sprintf(icon, "/usr/work/icon/%s", info.icon.c_str());
     argv = stringToArgv(exec, info.argv);
 
     MainPageUI::addApplication((name), exec, argv, icon); // 添加应用程序到UI
-
-    delete[] icon;
-    delete[] exec;
   }
 }
+
 
 void *MainPage::createShareMem(size_t memSize)
 {
@@ -512,7 +505,7 @@ int MainPage::bootThreadFunction(void)
 
   uiMutex->lock();
   MainPageUI::create(uiOpts, bgFile.c_str()); // 初始化主界面UI
-  // installApplications(sysConfig.appVector);
+  installApplications(sysConfig.appVector);
   uiMutex->unlock();
 
   uiMutex->lock();

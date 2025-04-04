@@ -2,9 +2,9 @@
  * @Author: yixi 3283804330@qq.com
  * @Date: 2025-03-31 15:06:02
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-03-31 19:02:29
+ * @LastEditTime: 2025-04-04 22:48:35
  * @Description: 
- * @FilePath: /lv_port_linux_frame_buffer/main.cpp
+ * @FilePath: /yixi_desktop/picture/main.cpp
  */
 
 
@@ -114,5 +114,5 @@ static void pictureExitCallback(void)
     delete picture;
     
     // sys_exit();
-    // exit(0);
+    exit(0);
 }

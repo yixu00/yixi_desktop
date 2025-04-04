@@ -1,10 +1,10 @@
 {
     "applications": [
         {
-            "name": "图片",
-            "exec": "/usr/work/picture",
+            "name": "picture",
+            "exec": "/usr/work/Picture",
             "argv": "<null>",
-            "icon": "/usr/work/icon/picture_icon.bin",
+            "icon": "picture_icon",
             "config": null
         }
     ]
